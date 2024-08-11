@@ -13,7 +13,7 @@ export default function ExpenseList() {
     <div className="mt-5">
         {isEmpty ? <p className="text-gray-600 text-2xl font-bold text-center">No Hay Gastos</p> : (
             <>
-                <p className="text-gray-600 text-2xl font-bold my-5">Listado de Gastos</p>
+                <p className="text-gray-600 text-2xl font-bold my-5 px-2">Listado de Gastos</p>
                 {filteredExpeses.map((expense) => (
                     <ExpenseDetail 
                         key={expense.id}
