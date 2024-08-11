@@ -2,14 +2,15 @@ import { categories } from "../data/categorias";
 import DatePicker from "react-date-picker";
 import "react-date-picker/dist/DatePicker.css";
 import "react-calendar/dist/Calendar.css";
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { DraftExpense, Value } from "../types";
 import { useBudget } from "../hooks/useBudget";
 import ErrorMessage from "./ErrorMessage";
 
 export default function ExpenseForm() {
 
-  const { dispatch } = useBudget();
+  const {state, dispatch } = useBudget();
+
   const initialState = {
     amount: 0,
     expenseName: "",
@@ -17,9 +18,19 @@ export default function ExpenseForm() {
     date: new Date(),
   }
 
+  useEffect(() => {
+      if(state.editingId){
+        const editingExpense = state.expenses.find((item) => item.id === state.editingId);
+        setExpense(editingExpense!);
+        // setPreviousAmount(editingExpense?.amount!)
+      }
+  }, [state.editingId])
+  
+
   const [expense, setExpense] = useState<DraftExpense>(initialState);
 
   const [error, setError] = useState('');
+  // const [previousAmount, setPreviousAmount] = useState(0)
 
   const hanldeChangeDate = (value: Value) => {
     setExpense({
@@ -40,10 +51,24 @@ export default function ExpenseForm() {
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    //Validar
     if (Object.values(expense).includes('') && expense.amount <= 0) {
         setError('Todos los campos son obligatorio');
         return;
+    }
+
+    //Validar que no pase del limited
+    // if (expense.amount > totales) {
+    //   setError('Este Presupuesto no es Valido');
+    //   return;
+    // }
+
+    if (state.editingId) {
+      //ACtualizar
+      dispatch({type: "update-expense", payload: {expense: {id: state.editingId, ...expense}}})
     }else{
+      //Agregar
       dispatch({type: "agregar-expense", payload: {expense}})
       setExpense(initialState);
       setError('');
@@ -54,7 +79,7 @@ export default function ExpenseForm() {
     <>
       <form onSubmit={handleSubmit} className="space-y-5">
         <legend className="uppercase text-center text-2xl font-black border-b-4 border-blue-500 py-2">
-          Nuevo Gasto
+          {state.editingId ? 'Guardar Cambios' : 'Nuevo Gasto'}
         </legend>
 
         {error && (<ErrorMessage>{error}</ErrorMessage>)}
@@ -123,7 +148,7 @@ export default function ExpenseForm() {
         <input
           type="submit"
           className="bg-blue-600 hover:bg-blue-700 w-full p-2 text-white uppercase font-bold rounded-lg"
-          value="Registrar Gasto"
+          value={state.editingId ? 'Guardar Cambios' : 'Registrar Gasto'}
         />
       </form>
     </>

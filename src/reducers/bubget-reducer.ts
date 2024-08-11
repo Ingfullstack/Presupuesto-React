@@ -6,19 +6,34 @@ export type BudgetAction =
   { type: 'show-modal'} |
   { type: 'close-modal'}|
   { type: 'agregar-expense', payload: {expense: DraftExpense}}|
-  { type: 'eliminar-expense', payload: {id: Expense['id']}}
+  { type: 'eliminar-expense', payload: {id: Expense['id']}}|
+  { type: 'get-expense-by-id', payload: {id: Expense['id']}}|
+  { type: 'update-expense', payload: {expense: Expense}}|
+  { type: 'resetar-app'}
 
 
 export type BudgetState = {
     budget: number,
     modal: boolean,
-    expenses: Expense[]
+    expenses: Expense[],
+    editingId: Expense['id']
+}
+
+const initialBudget = () => {
+    const localStorageBudget = localStorage.getItem('budget');
+    return localStorageBudget ? +localStorageBudget : 0
+}
+
+const localStorageExpense = () => {
+    const localStorageExpense = localStorage.getItem('expense');
+    return localStorageExpense ? JSON.parse(localStorageExpense) : [];
 }
 
 export const initialState: BudgetState = {
-    budget: 0,
+    budget: initialBudget(),
     modal: false,
-    expenses: []
+    expenses: localStorageExpense(),
+    editingId: ''
 }
 
 //Crear Id Unico
@@ -48,7 +63,8 @@ export const budgetReducer = (state:BudgetState = initialState, action: BudgetAc
     if(action.type === 'close-modal'){
         return{
             ...state,
-            modal: false
+            modal: false,
+            editingId: ''
         }
     }
 
@@ -68,6 +84,32 @@ export const budgetReducer = (state:BudgetState = initialState, action: BudgetAc
         return {
             ...state,
             expenses: state.expenses.filter((item) => item.id !== action.payload.id)
+        }
+    }
+
+    if (action.type === 'get-expense-by-id') {
+        return{
+            ...state,
+            editingId: action.payload.id,
+            modal: true
+        }
+    }
+
+    if (action.type === 'update-expense') {
+        return{
+            ...state,
+            expenses: state.expenses.map((item) => item.id === action.payload.expense.id ? action.payload.expense : item),
+            editingId: '',
+            modal: false
+        }
+    }
+
+    if (action.type === 'resetar-app') {
+        return{
+            ...state,
+            expenses: [],
+            budget: 0
+
         }
     }
 
