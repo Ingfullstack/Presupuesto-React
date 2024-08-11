@@ -6,10 +6,8 @@ import 'react-circular-progressbar/dist/styles.css';
 export default function BudgetTrancker() {
 
   const { state, totales, totalExpense, dispatch } = useBudget();
-
   const percentage = +((totalExpense / state.budget) * 100).toFixed(2);
-
-  console.log(percentage)
+  
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">

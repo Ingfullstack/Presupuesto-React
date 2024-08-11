@@ -4,6 +4,7 @@ import BudgetForm from "./components/BudgetForm";
 import BudgetTrancker from "./components/BudgetTrancker";
 import ExpenseModal from "./components/ExpenselModal";
 import ExpenseList from "./components/ExpenseList";
+import FilterByCategoria from "./components/FilterByCategoria";
 
 function App() { 
 
@@ -24,14 +25,15 @@ function App() {
         </h1>
       </header>
 
-      <section className="mx-2">
-        <div className="max-w-3xl bg-white shadow-lg mx-auto mt-10 p-10 rounded-lg">
+      <section>
+        <div className="max-w-3xl bg-white shadow-lg mx-auto mt-10 p-10 md:rounded-lg">
           {isValidBudget ? <BudgetTrancker/> : <BudgetForm/>}
         </div>
       </section>
 
       {isValidBudget && (
         <main className="max-w-3xl mx-auto py-10">
+          <FilterByCategoria/>
           <ExpenseList/>
           <ExpenseModal/>
         </main>
